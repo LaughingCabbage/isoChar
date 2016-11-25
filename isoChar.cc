@@ -17,16 +17,6 @@ static string type, source;
 int size_x = 0;
 int size_y = 0;
 
-template< typename T, size_t N, size_t M >
-void printImage( T(&img_matrix)[N][M]){
-	for(int i = 0; i < M; i++){
-		for(int j = 0; j < N; j++){
-			cout << img_matrix[i][j];
-		}
-		cout << endl;
-	}
-}
-
 
 int main(int argc, char **argv){
 	
@@ -73,28 +63,72 @@ int main(int argc, char **argv){
 		}
 	
 	}
-	
-	printImage(img_matrix);
 
-	/*
 	for(int i = 0; i < size_y; i++){
 		for(int j = 0; j < size_x; j++){
 			cout << img_matrix[i][j];
 		}
 		cout << endl;
 	}
-	*/
-	printImage(img_matrix);
+	
+
 	//create a vector to store boundary pixels
 	vector<pixel> boundary;
 	
 	//need to find starting pixel.
-	
-	for(int i = 0; i < size_y; i++){
-		for(int j = 0; j < size_x; j++){
-			
+	pixel start;
+	bool found = 0;
+	for(int i = 0; i < size_y && !found; i++){
+		for(int j = 0; j < size_x && !found; j++){
+			if(img_matrix[i][j] == '1'){
+				start.x = j;
+				start.y = i;
+				boundary.push_back(start);
+			}
 		}
 	}
+	
+	//need to begin tracing boundary
+	bool done = 0;
+	
+	int x = start.x;
+	int y = start.y;
+	pixel temp;
+	enum move {Up, Right, Left, Down};
+	//start by checking next column for black pixel
+	move current_move = Right;
+	while(!done){
+		//check if next pixel in row is black, add if it is.
+		switch(current_move){
+			case Up:
+				if(y > 0 && img_matrix[y-1][x]){
+					temp.x = x;
+					temp.y = y;
+					boundary.push_back(temp);
+					cout << "\nx: " << x << " y: " << y << endl;
+					y = y-1;
+				}else{
+					current_move = Right;
+				}
+			break;
+			
+			case Right:
+				cout<<"right case\n";
+				if( x < size_x && img_matrix[y][x+1] == '1'){
+					temp.x = x;
+					temp.y = y;
+					boundary.push_back(temp);
+					cout << "\nx: " << x << " y: " << y << endl;
+					x = x+1;
+				}else{
+					current_move = Up;
+				}
+			break;
+			
+			default:
+				cout<< "default...\n";
+		}
+	} 
 	
 	
 	return 0;
