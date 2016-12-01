@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include "Pixel.h"
 
 using namespace std;
 
@@ -9,9 +9,7 @@ using namespace std;
 
 //pixel structure to store x and y locations of
 //boundary values.
-typedef struct{
-	int x,y;
-} pixel;
+
 
 static string type, source;
 int size_x = 0;
@@ -22,7 +20,7 @@ int main(int argc, char **argv){
 	
 	if(argc < 2){
 		cout << "not enough arguments\n";
-		exit(1);
+		return 1;
 	}
 	cout << argc << endl;
 	for(int i = 0; i < argc; ++i){
@@ -34,7 +32,7 @@ int main(int argc, char **argv){
 	ifstream ifs(argv[1]);
 	if(ifs.fail()){
 		cout << "failed to open test file...\n";
-		exit(1);
+		return 1;
 	}
 	
 	getline(ifs, type);
@@ -48,13 +46,6 @@ int main(int argc, char **argv){
 	//need to create image matrix.
 	char img_matrix[size_x][size_y];
 	
-	/*vector<vector<char> > img_matrix;
-	//adjust size
-	img_matrix.resize(size_y);
-	for(int i = 0; i < size_y; ++i){
-		img_matrix[i].resize(size_x);
-	}
-	*/
 	
 	//read in matrix
 	for(int i = 0; i < size_y; i++){
@@ -64,6 +55,9 @@ int main(int argc, char **argv){
 	
 	}
 
+	ifs.close(); //close image stream
+
+	//printing the matrix
 	for(int i = 0; i < size_y; i++){
 		for(int j = 0; j < size_x; j++){
 			cout << img_matrix[i][j];
@@ -73,10 +67,10 @@ int main(int argc, char **argv){
 	
 
 	//create a vector to store boundary pixels
-	vector<pixel> boundary;
+	vector<Pixel> boundary;
 	
 	//need to find starting pixel.
-	pixel start;
+	Pixel start;
 	bool found = 0;
 	for(int i = 0; i < size_y && !found; i++){
 		for(int j = 0; j < size_x && !found; j++){
@@ -89,45 +83,69 @@ int main(int argc, char **argv){
 	}
 	
 	//need to begin tracing boundary
-	bool done = 0;
 	
 	int x = start.x;
 	int y = start.y;
-	pixel temp;
 	enum move {Up, Right, Left, Down};
 	//start by checking next column for black pixel
 	move current_move = Right;
+	bool done = 0;
 	while(!done){
 		//check if next pixel in row is black, add if it is.
 		switch(current_move){
-			case Up:
-				if(y > 0 && img_matrix[y-1][x]){
-					temp.x = x;
-					temp.y = y;
-					boundary.push_back(temp);
-					cout << "\nx: " << x << " y: " << y << endl;
-					y = y-1;
-				}else{
-					current_move = Right;
-				}
-			break;
 			
-			case Right:
+			case Right: //check right pixel
 				cout<<"right case\n";
-				if( x < size_x && img_matrix[y][x+1] == '1'){
-					temp.x = x;
-					temp.y = y;
-					boundary.push_back(temp);
+				if(x < size_x && img_matrix[y][x+1] == '1'){ //found black
+					Pixel temp(x,y);
+					boundary.push_back(temp); //add pixel to list
 					cout << "\nx: " << x << " y: " << y << endl;
-					x = x+1;
+					x = x+1; //continue right
+				}else{
+					current_move = Down; // found white, switch to down.
+				}
+
+			break;	//END RIGHT
+
+			case Down: //check down pixel
+				cout <<"down case\n";
+				if(y < sixe_y && img_matrix[y+1][x] == '1'){ //found black
+					Pixel temp(x,y);
+					boundary.push_back(temp); //add pixel to list
+					y = y+1; //continue down
+				}else{
+					current_move = Left;
+				}
+			break; //END DOWN
+			
+			case Left: //check left pixel
+				cout <<"left case\n"l;
+				if(x > 0 && img_matrix[x-1][y] == '1'){ //found black
+					Pixel temp(x,y);
+					boundary.push_back(temp);
+					x = x-1;
 				}else{
 					current_move = Up;
 				}
-			break;
+				
+			break; //END LEFT
+			
+			case Up:
+				if(y > 0 && img_matrix[y-1][x] == '1'){ //found black
+					Pixel temp(x,y);
+					boundary.push_back(temp);
+					cout << "\nx: " << x << " y: " << y << endl;
+					y = y-1; //continue up
+				}else{
+					current_move = Right;
+				}
+			break; // END UP
+			
 			
 			default:
 				cout<< "default...\n";
 		}
+		
 	} 
 	
 	
