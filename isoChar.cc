@@ -13,6 +13,8 @@ enum move {Up, Right, Left, Down};
 enum direction {North, East, South, West};
 void checkLeft(move& mv, direction& dir);
 void checkRight(move& mv, direction& dir);
+void drawBox(vector<vector<char> >& img_matrix,
+				int x_min, int y_min, int x_max, int y_max);
 
 static string type, source;
 int size_x = 0;
@@ -47,8 +49,10 @@ int main(int argc, char **argv){
 	
 	
 	//need to create image matrix.
-	char img_matrix[size_x][size_y];
-	
+	vector<vector<char> > img_matrix(size_y);
+	for(int i = 0; i < size_y; i++){
+		img_matrix[i].resize(size_x);
+	}
 	
 	//read in matrix
 	for(int i = size_y-1; i >= 0; i--){
@@ -59,15 +63,6 @@ int main(int argc, char **argv){
 	}
 
 	ifs.close(); //close image stream
-
-	//printing the matrix
-	for(int i = 0; i < size_y; i++){
-		for(int j = 0; j < size_x; j++){
-			cout << img_matrix[i][j];
-		}
-		cout << endl;
-	}
-	
 
 	//create a vector to store boundary pixels
 	vector<Pixel> boundary;
@@ -191,6 +186,22 @@ int main(int argc, char **argv){
 		<<" x_max: " << x_max << " y_max " << y_max << endl;
 		
 	//begin drawing box.
+	drawBox(img_matrix, x_min, y_min, x_max, y_max);
+	
+
+	//printing the matrix
+	for(int i = 0; i < size_y; i++){
+		for(int j = 0; j < size_x; j++){
+			cout << img_matrix[i][j];
+		}
+		cout << endl;
+	}
+
+	return 0;
+}
+
+void drawBox(vector<vector<char> >& img_matrix,
+				 int x_min, int y_min, int x_max, int y_max){
 	
 	y_min--; //avoid writing on characters
 	x_min--;
@@ -216,16 +227,7 @@ int main(int argc, char **argv){
 	for(int i = y_min; i <= y_max; i++){
 		img_matrix[i][x_max] = '1';
 	}
-	
-	//printing the matrix
-	for(int i = 0; i < size_y; i++){
-		for(int j = 0; j < size_x; j++){
-			cout << img_matrix[i][j];
-		}
-		cout << endl;
-	}
-	
-	return 0;
+
 }
 
 
@@ -234,6 +236,7 @@ bool Pixel::isEqual(Pixel in){
 		return true;
 	return false;
 }
+
 
 
 
