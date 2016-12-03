@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "Pixel.h"
+#include "isoChar.h"
 
 using namespace std;
 
@@ -9,7 +9,10 @@ using namespace std;
 
 //pixel structure to store x and y locations of
 //boundary values.
-
+enum move {Up, Right, Left, Down};
+enum direction {North, East, South, West};
+void checkLeft(move& mv, direction& dir);
+void checkRight(move& mv, direction& dir);
 
 static string type, source;
 int size_x = 0;
@@ -48,8 +51,8 @@ int main(int argc, char **argv){
 	
 	
 	//read in matrix
-	for(int i = 0; i < size_y; i++){
-		for(int j = 0; j < size_x; j++){
+	for(int i = size_y-1; i >= 0; i--){
+		for(int j = size_x-1; j >= 0; j--){
 			ifs >> img_matrix[i][j];
 		}
 	
@@ -77,79 +80,159 @@ int main(int argc, char **argv){
 			if(img_matrix[i][j] == '1'){
 				start.x = j;
 				start.y = i;
-				boundary.push_back(start);
+				found = true;
+				cout << "start pixel found at x: "
+					 << start.x << " y: " << start.y << endl;
+			}
+		}
+	}
+	 
+	//need to begin tracing boundary
+	int x = start.x-1;
+	int y = start.y;
+	//start by checking next column for black pixel
+	direction current_direction = East;
+	bool done = false;
+	while(!done){
+		switch(current_direction){
+			case East:
+				cout<<"east\n";
+				if(x < size_x){ //check boundary
+					x = x+1; //visit pixel
+					if(img_matrix[y][x] == '1'){
+						current_direction = North;
+						Pixel temp(x,y);
+						boundary.push_back(temp);
+						cout << "x: " << x << " y: " << y << endl;
+					}else{
+						current_direction = South;
+					}
+				}
+			break;
+			
+			case North:
+				cout<<"north\n";
+				if(y > 0){//check boundary
+					y = y-1;
+					if(img_matrix[y][x] == '1'){
+						current_direction = West;
+						Pixel temp(x,y);
+						boundary.push_back(temp);
+						cout << "x: " << x << " y: " << y << endl;
+					}else{
+						current_direction = East;
+					}
+				}
+						
+			break;
+			
+			case West:
+				cout<<"West\n";
+				if(x > 0){
+					x = x-1;
+					if(img_matrix[y][x] == '1'){
+						current_direction = South;
+						Pixel temp(x,y);
+						boundary.push_back(temp);
+						cout << "x: " << x << " y: " << y << endl;
+					}else{
+						current_direction = North;
+					}
+				}
+			break;
+			
+			case South:
+				cout<<"South\n";
+				if(y < size_y){
+					y = y+1;
+					if(img_matrix[y][x] == '1'){
+						current_direction = East;
+						Pixel temp(x,y);
+						boundary.push_back(temp);
+						cout << "x: " << x << " y: " << y << endl;
+					}else{
+						current_direction = West;
+					}
+				}
+			break;
+		}
+		if(boundary.size() > 1){ //check if pixel is equal to start pixel. 
+			if(start.isEqual(boundary[boundary.size()-1])){
+				cout << "start pixel reached\n";
+				done = true;
 			}
 		}
 	}
 	
-	//need to begin tracing boundary
+	//begin drawing box.
 	
-	int x = start.x;
-	int y = start.y;
-	enum move {Up, Right, Left, Down};
-	//start by checking next column for black pixel
-	move current_move = Right;
-	bool done = 0;
-	while(!done){
-		//check if next pixel in row is black, add if it is.
-		switch(current_move){
-			
-			case Right: //check right pixel
-				cout<<"right case\n";
-				if(x < size_x && img_matrix[y][x+1] == '1'){ //found black
-					Pixel temp(x,y);
-					boundary.push_back(temp); //add pixel to list
-					cout << "\nx: " << x << " y: " << y << endl;
-					x = x+1; //continue right
-				}else{
-					current_move = Down; // found white, switch to down.
-				}
-
-			break;	//END RIGHT
-
-			case Down: //check down pixel
-				cout <<"down case\n";
-				if(y < sixe_y && img_matrix[y+1][x] == '1'){ //found black
-					Pixel temp(x,y);
-					boundary.push_back(temp); //add pixel to list
-					y = y+1; //continue down
-				}else{
-					current_move = Left;
-				}
-			break; //END DOWN
-			
-			case Left: //check left pixel
-				cout <<"left case\n"l;
-				if(x > 0 && img_matrix[x-1][y] == '1'){ //found black
-					Pixel temp(x,y);
-					boundary.push_back(temp);
-					x = x-1;
-				}else{
-					current_move = Up;
-				}
-				
-			break; //END LEFT
-			
-			case Up:
-				if(y > 0 && img_matrix[y-1][x] == '1'){ //found black
-					Pixel temp(x,y);
-					boundary.push_back(temp);
-					cout << "\nx: " << x << " y: " << y << endl;
-					y = y-1; //continue up
-				}else{
-					current_move = Right;
-				}
-			break; // END UP
-			
-			
-			default:
-				cout<< "default...\n";
+	//start by finding extremes.
+	int x_min = 99999;
+	int x_max = 0;
+	int y_min = 99999;
+	int y_max = 0;
+	
+	for(int i = 0; i < boundary.size();i++){
+		if(boundary[i].x < x_min){
+			x_min = boundary[i].x;
 		}
+		if(boundary[i].y < y_min){
+			y_min = boundary[i].y;
+		}
+		if(boundary[i].x > x_max){
+			x_max = boundary[i].x;
+		}
+		if(boundary[i].y > y_max){
+			y_max = boundary[i].y;
+		}
+	}
+	
+	cout <<"xmin: " << x_min << " ymin: " << y_min
+		<<" x_max: " << x_max << " y_max " << y_max << endl;
 		
+	//begin drawing box.
+	
+	y_min--; //avoid writing on characters
+	x_min--;
+	y_max++;
+	x_max++;
+	
+	//draw top of box
+	for(int i = x_min; i <= x_max; i++){
+		img_matrix[y_min][i] = '1';
 	} 
 	
+	//draw bottom of box
+	for(int i = x_min; i <= x_max; i++){
+		img_matrix[y_max][i] = '1';
+	}
+	
+	//draw left of box
+	for(int i = y_min; i <= y_max; i++){
+		img_matrix[i][x_min] = '1';
+	}
+	
+	//draw right of box
+	for(int i = y_min; i <= y_max; i++){
+		img_matrix[i][x_max] = '1';
+	}
+	
+	//printing the matrix
+	for(int i = 0; i < size_y; i++){
+		for(int j = 0; j < size_x; j++){
+			cout << img_matrix[i][j];
+		}
+		cout << endl;
+	}
 	
 	return 0;
+}
+
+
+bool Pixel::isEqual(Pixel in){
+	if(x == in.x && y == in.y)
+		return true;
+	return false;
 }
 
 
