@@ -1,12 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <queue>
 #include "isoChar.h"
 #include "pixel.h"
 
 using namespace std;
 
-
+#define TOL 0.9
 
 //pixel structure to store x and y locations of
 //boundary values.
@@ -30,7 +31,7 @@ int main(int argc, char **argv){
 	}
 		
 	
-	isoChar iso;
+	isoChar iso; //START
 		
 	//load image	
 	if(iso.load(argv[1])){
@@ -38,25 +39,38 @@ int main(int argc, char **argv){
 		return 0;
 	}
 	
-	iso.printMatrix();
+	iso.printMatrix(); //print initial image.
 	
-	int x_next = 0;
-	int y_next = 0;
-
+	while(1){
+		Pixel seed(0,0);
+		if(!iso.getStart(seed))
+			break;
+		cout<<"seed x " << seed.x << " y " << seed.y << endl;
+		iso.trace(seed);
+	}
+	
+	iso.drawBoxes();
+	
+	
+	cout << "\nsize contour_boxes: " << iso.contour_boxes.size() << endl;
+	
+	/*
+	int timeout = iso.size_y;
 	int i = 4;
 	while(i > 0){	
 		Pixel pixel_next(x_next,y_next);
-	
 		if(iso.getStart(pixel_next)){
 			cout << " failed to get start pixel\n";
-			break;
+			
+		}else{
+			timeout = iso.size_y;
+			iso.trace(pixel_next, x_next, y_next);
+			cout << "x_next: " << x_next << " y_next: " << y_next << endl;
 		}
-
-
-		iso.trace(pixel_next, x_next, y_next);
 		i--;
-		cout << "x_next: " << x_next << " y_next: " << y_next << endl;
 	}
+	
+	*/
 	
 	iso.printMatrix();
 	

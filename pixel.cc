@@ -5,3 +5,9 @@ bool Pixel::isEqual(Pixel in){
 		return true;
 	return false;
 }
+
+bool Pixel::operator==(Pixel arg){
+	if(x == arg.x && y == arg.y)
+		return true;
+	return false;
+}
