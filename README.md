@@ -16,3 +16,6 @@ a file with the .new suffix. The threaded version of this program is introduced 
 the trace file but does not significantly improve program execution. The threadded 
 version of this program can be improved by creating a thread to check if a given 
 pixel is within a bounding box as this operation encompasses the bulk of execution time.
+
+![Screenshot: Before](alph.jpg?raw=true "Before")
+![Screenshot: After](alph_out.jpg?raw=true "After")
