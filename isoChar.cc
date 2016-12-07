@@ -5,7 +5,7 @@
 #include "pixel.h"
 #include "isoChar.h"
 
-#define PADDING 1 //padding of pixel box.
+#define PADDING 2 //padding of pixel box.
 
 using namespace std;
 
@@ -15,12 +15,10 @@ isoChar::isoChar(){
 }
  
 void isoChar::drawBoxes(){
-	cout << "begin draw boxes\n";
 	if(contour_boxes.empty())
 		return;
 	
 	for(int z = 0; z < contour_boxes.size(); z++){	
-		cout << "drawing box " << z << endl;
 		//draw top of box
 		for(int i = contour_boxes[z].x_min; i <= contour_boxes[z].x_max; i++){
 			img_matrix[contour_boxes[z].y_min][i] = '1';
@@ -49,19 +47,14 @@ bool isoChar::load(char *file_name){
 		//lets try to oepn the test file
 	ifstream ifs(file_name);
 	if(ifs.fail()){
-		cout << "failed to open test file...\n";
+		cout << "open file failed\n";
 		return 1;
 	}
 	
 	getline(ifs, type);
-	cout << "file type: " << type << endl;
 	getline(ifs,source);
-	cout <<"file source: " << source << endl;
 	ifs >> size_x >> size_y;
 
-	cout << "size_x: " << size_x << "\nsize_y: " << size_y << endl;
-	
-	//cout<<"making matrix\n";
 	//need to create image matrix.
 	img_matrix.resize(size_y);
 	for(int i = 0; i < size_y; i++){
@@ -81,8 +74,37 @@ bool isoChar::load(char *file_name){
 
 }
 
+void isoChar::write(char *file_name){
+	
+	//lets make output file names different.
+	string file = file_name;
+	string outType = "_iso";
+	int i = 0;
+	for(; i < file.length(); i++){ //find period
+		if(file[i] == '.')
+			break;
+	}
+	file.insert(i,outType);	
+	
+	ofstream ofs(file.c_str());
+	if(ofs.fail()){
+		cout << "output fial stream fail\n";
+	}
+	
+	ofs << type << endl << source << endl << size_x << " " << size_y << endl;
+	
+	//read in matrix
+	for(int i = size_y-1; i >= 0; i--){
+		for(int j = size_x-1; j >= 0; j--){
+			ofs << img_matrix[i][j];
+		}
+		ofs << endl;
+	}
+	
+	ofs.close();
+}
+
 void isoChar::trace(Pixel& start){
-	cout << "begin tracing\n";
 	//create a vector to store boundary pixels
 	vector<Pixel> boundary;
 	
@@ -177,12 +199,6 @@ void isoChar::trace(Pixel& start){
 		}
 	}
 	
-	cout <<"before pading-- ";
-	
-	cout <<"xmin: " << x_min << " ymin: " << y_min
-		<<" x_max: " << x_max << " y_max " << y_max << endl;
-	
-	
 	y_min = y_min - PADDING; //box recatangle padding.
 	x_min = x_min - PADDING;
 	y_max = y_max + PADDING;
@@ -191,25 +207,16 @@ void isoChar::trace(Pixel& start){
 	Box contour_box(x_min, x_max, y_min, y_max);
 	contour_boxes.push_back(contour_box); //add contour box
 	
-	
-	cout <<"xmin: " << x_min << " ymin: " << y_min
-		<<" x_max: " << x_max << " y_max " << y_max << endl;
-	
-	
 }
 
 int isoChar::getStart(Pixel& start){
-	cout << "looking for start\n";
 	for(int i = 0; i < size_y; i++){
 		for(int j = 0; j < size_x; j++){
 			if(img_matrix[i][j] == '1'){
 				int index = inBoxes(j,i);
-				cout << "index " << index << endl;
 			 	if(index != -1){ //pixel is in a box. skip over it
 					j = j + contour_boxes[index].width();
-					cout << "new j = " << j << endl;
 				}else{
-					cout << "start found\n";
 					start.x = j;
 					start.y = i;
 					return 1;	
@@ -218,6 +225,7 @@ int isoChar::getStart(Pixel& start){
 		}
 	}
 	return 0;
+	
 }
 
 void isoChar::printMatrix(){
@@ -230,32 +238,13 @@ void isoChar::printMatrix(){
 	}
 }
 
-/*
-bool isoChar::isBoundary(Pixel& tmp){
-	cout << "boundary called\n";
-	if(box_pixels.empty()){
-		return false;
-	}
-	
-	if(find(box_pixels.begin(), box_pixels.end(), tmp) != box_pixels.end()){
-		cout << "found boundary\n";
-		return true;
-	}
-	cout << "no boundary\n";
-	return false;
-}
-
-*/
-
 int isoChar::inBoxes(int x, int y){ //return index to box
 	if(contour_boxes.empty()){
-		cout << "contour_boxes is empty\n";
 		return -1;
 	}
 
 	for(int i = 0; i < contour_boxes.size(); i++){
 		if(contour_boxes[i].isIn(x,y)){
-			cout << "in box, return " << i << endl;
 			return i;
 		}
 	}

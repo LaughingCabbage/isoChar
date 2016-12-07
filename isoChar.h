@@ -12,11 +12,11 @@ class isoChar {
 	public:
 		isoChar();
 		bool load(char *file_name);
+		void write(char *file_name);
 		void trace(Pixel& start);
 		void drawBoxes();
 		int getStart(Pixel& start);
 		void printMatrix();
-		//bool isBoundary(Pixel& tmp);
 		int inBoxes(int x, int y);
 		
 		

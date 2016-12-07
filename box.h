@@ -8,7 +8,6 @@ class Box{
 			
 		bool isIn(int x, int y){
 			if(x >= x_min && x <= x_max && y >= y_min && y <= y_max){
-				std::cout << "pixel is in box\n";
 				return true;
 			}
 			return false;
