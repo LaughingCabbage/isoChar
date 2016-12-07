@@ -36,6 +36,8 @@ int main(int argc, char **argv){
 	cout << "Drawing Boxes...\n";
 	iso.drawBoxes();
 	
+	cerr << "Total Boxes Found: " << iso.contour_boxes.size() << endl;
+	
 	cout << "Writing to File...\n";
 	iso.write(argv[1]);	
 	

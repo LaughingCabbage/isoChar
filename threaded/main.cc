@@ -2,10 +2,15 @@
 #include <fstream>
 #include <vector>
 #include <queue>
+#include <pthread.h>
 #include "isoChar.h"
 #include "pixel.h"
 
 using namespace std;
+
+isoChar iso;
+
+void *getContours(void *ptr);
 
 
 int main(int argc, char **argv){
@@ -16,7 +21,6 @@ int main(int argc, char **argv){
 	}
 
 	cout << "Starting isoChar\n";
-	isoChar iso; //START
 		
 	//load image
 	cout << "Loading Image " << argv[1] << "...\n";	
@@ -25,16 +29,20 @@ int main(int argc, char **argv){
 		return 0;
 	}
 	
+	pthread_t traceThread, drawThread;
+	int traceID;
 	cout << "Begin Tracing...\n";
-	while(1){
-		Pixel seed(0,0);
-		if(!iso.getStart(seed))
-			break;
-		iso.trace(seed);
+	traceID = pthread_create(&traceThread, NULL, &getContours, NULL);
+	if(traceID){
+		cout << "trace thread creation failed\n";
+		return 1;
 	}
+	pthread_join(traceThread,NULL);	
 	
 	cout << "Drawing Boxes...\n";
 	iso.drawBoxes();
+	
+	cerr << "Total Boxes Found: " << iso.contour_boxes.size() << endl;
 	
 	cout << "Writing to File...\n";
 	iso.write(argv[1]);	
@@ -42,4 +50,16 @@ int main(int argc, char **argv){
 	cout << "done...\n";
 	return 0;
 
+}
+
+void *getContours(void *ptr){
+	cout << "enter contour thread function\n";
+	while(1){
+		Pixel seed(0,0);
+		if(!iso.getStart(seed))
+			break;
+		iso.trace(seed);
+	}
+	
+	return NULL;
 }

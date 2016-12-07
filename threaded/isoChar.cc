@@ -5,7 +5,7 @@
 #include "pixel.h"
 #include "isoChar.h"
 
-#define PADDING 2 //padding of pixel box.
+#define PADDING 1 //padding of pixel box.
 
 using namespace std;
 
@@ -78,6 +78,7 @@ void isoChar::write(char *file_name){
 	
 	//lets make output file names different.
 	string file = file_name;
+	/*
 	string outType = "_iso";
 	int i = 0;
 	for(; i < file.length(); i++){ //find period
@@ -85,10 +86,11 @@ void isoChar::write(char *file_name){
 			break;
 	}
 	file.insert(i,outType);	
-	
+	*/
+	file = file + ".new";
 	ofstream ofs(file.c_str());
 	if(ofs.fail()){
-		cout << "output fial stream fail\n";
+		cout << "output stream fail\n";
 	}
 	
 	ofs << type << endl << source << endl << size_x << " " << size_y << endl;
