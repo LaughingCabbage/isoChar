@@ -1,8 +1,9 @@
+##Head
 isoChar - isolation of characters
 Kevin Gentile
 12/07/2016
 
-
+##Description
 The purpouse of this program is to read in an ASCII .pbm image file, trace items
 of interest, and encapsulate them inside a bounding box. The program is given in
 a sequential version and a threaded version. The sequential version loads an
