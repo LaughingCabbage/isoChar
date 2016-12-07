@@ -17,5 +17,7 @@ the trace file but does not significantly improve program execution. The threadd
 version of this program can be improved by creating a thread to check if a given 
 pixel is within a bounding box as this operation encompasses the bulk of execution time.
 
+##Before
 ![Screenshot: Before](alph.jpg?raw=true "Before")
+##After
 ![Screenshot: After](alph_out.jpg?raw=true "After")
