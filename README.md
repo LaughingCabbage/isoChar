@@ -1,9 +1,9 @@
-##Head
+## Head
 isoChar - isolation of characters
 Kevin Gentile
 12/07/2016
 
-##Description
+## Description
 The purpose of this program is to read in an ASCII .pbm image file, trace items
 of interest, and encapsulate them inside a bounding box. The program is given in
 a sequential version and a threaded version. The sequential version loads an
@@ -17,7 +17,7 @@ the trace file but does not significantly improve program execution. The threade
 version of this program can be improved by creating a thread to check if a given 
 pixel is within a bounding box as this operation encompasses the bulk of execution time.
 
-##Before
+## Before
 ![Screenshot: Before](alph.jpg?raw=true "Before")
-##After
+## After
 ![Screenshot: After](alph_out.jpg?raw=true "After")
